@@ -16,7 +16,7 @@ def get_generations(db: Session) -> list[dto.GenerationDTO]:
 
 def get_generation_by_name(db: Session, name: str) -> dto.GenerationDTO | None:
     stmt = select(PokemonGeneration).where(PokemonGeneration.name == name)
-    generation = db.scalars(stmt).scalar_one_or_none()
+    generation = db.scalars(stmt).one_or_none()
     return dto.GenerationDTO.from_orm(generation) if generation else None
 
 
@@ -52,7 +52,7 @@ def create_pokemon(
     tag_names: list[str],
 ) -> dto.PokemonDTO:
     stmt = select(PokemonGeneration).where(PokemonGeneration.name == generation_name)
-    generation = db.scalars(stmt).scalar_one_or_none()
+    generation = db.scalars(stmt).one_or_none()
     if not generation:
         raise Exception("Generation not found")
 
@@ -156,10 +156,8 @@ def get_eras(db: Session) -> list[dto.EraDTO]:
     return [dto.EraDTO.from_orm(era) for era in eras]
 
 
-def create_era(
-    db: Session, name: str, start_year: int, end_year: int, publisher: str
-) -> dto.EraDTO:
-    era = Era(name=name, start_year=start_year, end_year=end_year, publisher=publisher)
+def create_era(db: Session, name: str) -> dto.EraDTO:
+    era = Era(name=name)
     db.add(era)
     db.commit()
     db.refresh(era)
@@ -188,20 +186,18 @@ def create_set(
     name: str,
     era_id: int,
     release_date: date,
+    era_index: float,
     abbreviation: str,
-    total_cards: int,
-    secret_cards: int,
 ) -> dto.SetDTO:
     era = db.query(Era).filter(Era.id == era_id).first()
     if not era:
         raise Exception("Era not found")
     set = Set(
         name=name,
+        era_index=era_index,
         era=era,
         release_date=release_date,
         abbreviation=abbreviation,
-        total_cards=total_cards,
-        secret_cards=secret_cards,
     )
     db.add(set)
     db.commit()

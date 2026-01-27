@@ -87,18 +87,12 @@ class PokemonGQL:
 class EraGQL:
     id: int
     name: str
-    start_year: int
-    end_year: int
-    publisher: str
 
     @classmethod
     def from_dto(cls, era: EraDTO) -> "EraGQL":
         return cls(
             id=era.id,
-            name=era.name,
-            start_year=era.start_year,
-            end_year=era.end_year,
-            publisher=era.publisher,
+            name=era.name
         )
 
 
@@ -109,9 +103,6 @@ class SetGQL:
     era_index: float
     release_date: date
     abbreviation: str
-    total_cards: int
-    secret_cards: int
-    era: EraGQL
 
     @classmethod
     def from_dto(cls, set: SetDTO) -> "SetGQL":
@@ -121,7 +112,4 @@ class SetGQL:
             era_index=set.era_index,
             release_date=set.release_date,
             abbreviation=set.abbreviation,
-            total_cards=set.total_cards,
-            secret_cards=set.secret_cards,
-            era=EraGQL.from_dto(set.era),
         )

@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from typing import List, Optional
-from datetime import datetime
+from datetime import datetime, date
 
 from app.db import models
 
@@ -73,9 +73,6 @@ class PokemonDTO:
 class EraDTO:
     id: int
     name: str
-    start_year: int
-    end_year: int
-    publisher: str
     sets: List["SetDTO"]
 
     @classmethod
@@ -83,9 +80,6 @@ class EraDTO:
         return cls(
             id=era.id,
             name=era.name,
-            start_year=era.start_year,
-            end_year=era.end_year,
-            publisher=era.publisher,
             sets=[SetDTO.from_orm(set) for set in era.sets],
         )
 
@@ -94,12 +88,8 @@ class SetDTO:
     id: int
     name: str
     era_index: float
-    release_date: datetime
+    release_date: date
     abbreviation: str
-    total_cards: int
-    secret_cards: int
-    era: EraDTO
-    cards: List["CardDTO"]
     star_pokemons: List["PokemonDTO"]
 
     @classmethod
@@ -110,10 +100,6 @@ class SetDTO:
             era_index=set.era_index,
             release_date=set.release_date,
             abbreviation=set.abbreviation,
-            total_cards=set.total_cards,
-            secret_cards=set.secret_cards,
-            era=EraDTO.from_orm(set.era),
-            cards=[CardDTO.from_orm(card) for card in set.cards],
             star_pokemons=[PokemonDTO.from_orm(pokemon) for pokemon in set.star_pokemons],
         )
 

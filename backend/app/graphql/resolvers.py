@@ -72,7 +72,7 @@ def update_pokemon_name_resolver(id: int, name: str) -> PokemonGQL | None:
     db: Session = next(get_db())
     pokemon_dto = crud.update_pokemon_by_id(db, id, name=name)
     if pokemon_dto is None:
-        return None # Pokemon not found
+        return None  # Pokemon not found
     return PokemonGQL.from_dto(pokemon_dto)
 
 
@@ -128,11 +128,9 @@ def get_eras_resolver() -> List[EraGQL]:
     return [EraGQL.from_dto(era) for era in crud.get_eras(db)]
 
 
-def create_era_resolver(
-    name: str, start_year: int, end_year: int, publisher: str
-) -> EraGQL:
+def create_era_resolver(name: str) -> EraGQL:
     db: Session = next(get_db())
-    era = crud.create_era(db, name, start_year, end_year, publisher)
+    era = crud.create_era(db, name)
     return EraGQL.from_dto(era)
 
 
@@ -161,13 +159,10 @@ def create_set_resolver(
     era_id: int,
     release_date: date,
     abbreviation: str,
-    total_cards: int,
-    secret_cards: int,
+    era_index: float,
 ) -> SetGQL:
     db: Session = next(get_db())
-    set = crud.create_set(
-        db, name, era_id, release_date, abbreviation, total_cards, secret_cards
-    )
+    set = crud.create_set(db, name, era_id, release_date, era_index, abbreviation)
     return SetGQL.from_dto(set)
 
 

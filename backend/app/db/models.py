@@ -164,10 +164,6 @@ class Era(Base):
     __tablename__ = "era"
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(255))
-    start_year: Mapped[int]
-    end_year: Mapped[int]
-    publisher: Mapped[str] = mapped_column(String(255))
-
     sets: Mapped[list["Set"]] = relationship(
         back_populates="era", cascade="all, delete-orphan"
     )
@@ -186,8 +182,6 @@ class Set(Base):
 
     release_date: Mapped[Date] = mapped_column(Date)
     abbreviation: Mapped[str] = mapped_column(String(10))
-    total_cards: Mapped[int]
-    secret_cards: Mapped[int]
 
     era_id: Mapped[int] = mapped_column(ForeignKey("era.id"))
     era: Mapped["Era"] = relationship(back_populates="sets")

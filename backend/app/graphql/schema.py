@@ -93,7 +93,7 @@ class Mutation:
     # --- Eras ---
     create_era = strawberry.field(
         resolver=resolvers.create_era_resolver,
-        description="Create a new Pokémon era with its name, start year, end year and publisher."
+        description="Create a new Pokémon era with its name."
     )
     delete_era = strawberry.field(
         resolver=resolvers.delete_era_resolver,
@@ -103,12 +103,13 @@ class Mutation:
     # --- Sets ---
     create_set = strawberry.field(
         resolver=resolvers.create_set_resolver,
-        description="Create a new Pokémon card set with its name, era id, release date, abbreviation, total cards and secret cards."
+        description="Create a new Pokémon card set with its name, era id, release date, era index and abv"
     )
     delete_set = strawberry.field(
         resolver=resolvers.delete_set_resolver,
         description="Delete a Pokémon card set."
     )
+
 
 # Combine schema
 schema = strawberry.Schema(query=Query, mutation=Mutation)
