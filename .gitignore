@@ -35,6 +35,8 @@ Thumbs.db
 .env
 .env.local
 
+# VS Code
+.vscode/
 
 # Pytest / coverage
 htmlcov/
