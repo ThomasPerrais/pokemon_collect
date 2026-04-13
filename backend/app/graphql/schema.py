@@ -9,6 +9,7 @@ class Query:
     Root Query type for GraphQL.
     Each field here maps to a resolver function.
     """
+
     # --- Generations ---
     generations = strawberry.field(
         resolver=resolvers.get_generations_resolver,
@@ -45,6 +46,13 @@ class Query:
         description="Retrieve a list of Pokémon card sets. Can apply optional filters.",
     )
 
+    # --- Cards ---
+    cards = strawberry.field(
+        resolver=resolvers.get_cards_resolver,
+        description="Retrieve a list of Pokémon cards. Can apply optional filters.",
+    )
+
+
 # --- Mutations ---
 @strawberry.type
 class Mutation:
@@ -52,6 +60,7 @@ class Mutation:
     Root Mutation type for GraphQL.
     Each field here maps to a resolver function.
     """
+
     # --- Generations ---
 
     create_generation = strawberry.field(
@@ -67,47 +76,47 @@ class Mutation:
 
     update_pokemon_name = strawberry.field(
         resolver=resolvers.update_pokemon_name_resolver,
-        description="Update the name of a Pokémon by its id."
+        description="Update the name of a Pokémon by its id.",
     )
 
     # --- Types ---
     create_pokemon_type = strawberry.field(
         resolver=resolvers.create_type_resolver,
-        description="Create a new Pokémon type."
+        description="Create a new Pokémon type.",
     )
     delete_pokemon_type = strawberry.field(
-        resolver=resolvers.delete_type_resolver,
-        description="Delete a Pokémon type."
+        resolver=resolvers.delete_type_resolver, description="Delete a Pokémon type."
     )
 
     # --- Tags ---
     create_pokemon_tag = strawberry.field(
-        resolver=resolvers.create_tag_resolver,
-        description="Create a new Pokémon tag."
+        resolver=resolvers.create_tag_resolver, description="Create a new Pokémon tag."
     )
     delete_pokemon_tag = strawberry.field(
-        resolver=resolvers.delete_tag_resolver,
-        description="Delete a Pokémon tag."
+        resolver=resolvers.delete_tag_resolver, description="Delete a Pokémon tag."
     )
 
     # --- Eras ---
     create_era = strawberry.field(
         resolver=resolvers.create_era_resolver,
-        description="Create a new Pokémon era with its name."
+        description="Create a new Pokémon era with its name.",
     )
     delete_era = strawberry.field(
-        resolver=resolvers.delete_era_resolver,
-        description="Delete a Pokémon era."
+        resolver=resolvers.delete_era_resolver, description="Delete a Pokémon era."
     )
 
     # --- Sets ---
     create_set = strawberry.field(
         resolver=resolvers.create_set_resolver,
-        description="Create a new Pokémon card set with its name, era id, release date, era index and abv"
+        description="Create a new Pokémon card set with its name, era id, release date, era index and abv",
     )
     delete_set = strawberry.field(
-        resolver=resolvers.delete_set_resolver,
-        description="Delete a Pokémon card set."
+        resolver=resolvers.delete_set_resolver, description="Delete a Pokémon card set."
+    )
+    # --- Cards ---
+    create_card = strawberry.field(
+        resolver=resolvers.create_card_resolver,
+        description="Create a new Pokémon card with its name, number, rarity, type, set id, image path and pokemon id.",
     )
 
 

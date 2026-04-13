@@ -1,8 +1,16 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
-from app.db.models import Pokemon, PokemonType, PokemonTag, PokemonGeneration, Era, Set
-from app.db.filters import apply_pokemon_filters, apply_set_filters
-from app.db.schemas import PokemonFilterParams, SetFilterParams
+from app.db.models import (
+    Pokemon,
+    PokemonType,
+    PokemonTag,
+    PokemonGeneration,
+    Era,
+    Set,
+    Card,
+)
+from app.db.filters import apply_pokemon_filters, apply_set_filters, apply_card_filters
+from app.db.schemas import PokemonFilterParams, SetFilterParams, CardFilterParams
 from app.db import dto
 from datetime import date
 from typing import Any
@@ -211,3 +219,68 @@ def delete_set(db: Session, id: int) -> dto.SetDTO | None:
         db.delete(set)
         db.commit()
     return dto.SetDTO.from_orm(set) if set else None
+
+
+# --- Cards ---
+def get_cards(
+    db: Session, filters: CardFilterParams | None = None
+) -> list[dto.CardDTO]:
+    stmt = select(Card)
+    if filters:
+        stmt = apply_card_filters(stmt, filters)
+    cards = db.scalars(stmt).all()
+    return [dto.CardDTO.from_orm(card) for card in cards]
+
+
+def create_card(
+    db: Session,
+    name: str,
+    number: int,
+    rarity: str,
+    type: str,
+    image_path: str,
+    set_id: int,
+    pokemon_id: int | None,
+) -> dto.CardDTO:
+    stmt = select(Set).where(Set.id == set_id)
+    set = db.scalars(stmt).one_or_none()
+    if not set:
+        raise Exception("Set not found")
+
+    try:
+        card_type = Card.CardType(type)
+    except ValueError:
+        raise Exception("unknown card type")
+    
+    pokemon = None
+    if pokemon_id:
+        stmt = select(Pokemon).where(Pokemon.id == pokemon_id)
+        pokemon = db.scalars(stmt).one_or_none()
+        if not pokemon:
+            raise Exception("Pokemon not found")
+    elif card_type == Card.CardType.pokemon:
+        raise Exception("Pokemon card must have a pokemon")
+
+    try:
+        card_rarity = Card.CardRarity(rarity)
+    except ValueError:
+        raise Exception("unknown card rarity")
+
+    card = Card(
+        name=name,
+        number=number,
+        rarity=card_rarity,
+        type=card_type,
+        image_path=image_path,
+        set=set,
+        pokemon=pokemon,
+    )
+
+    try:
+        db.add(card)
+        db.commit()
+        db.refresh(card)
+        return dto.CardDTO.from_orm(card)
+    except Exception:
+        db.rollback()
+        raise

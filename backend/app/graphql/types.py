@@ -1,7 +1,7 @@
 import strawberry
 from datetime import date
 
-from app.db.dto import GenerationDTO, TypeDTO, TagDTO, PokemonDTO, EraDTO, SetDTO
+from app.db.dto import GenerationDTO, TypeDTO, TagDTO, PokemonDTO, EraDTO, SetDTO, CardDTO
 
 
 @strawberry.type
@@ -112,4 +112,27 @@ class SetGQL:
             era_index=set.era_index,
             release_date=set.release_date,
             abbreviation=set.abbreviation,
+        )
+
+
+@strawberry.type
+class CardGQL:
+    id: int
+    name: str
+    number: int
+    rarity: str
+    type: str
+    set: SetGQL
+    pokemon: PokemonGQL | None = None
+
+    @classmethod
+    def from_dto(cls, card: CardDTO) -> "CardGQL":
+        return cls(
+            id=card.id,
+            name=card.name,
+            number=card.number,
+            rarity=card.rarity,
+            type=card.type,
+            set=SetGQL.from_dto(card.set),
+            pokemon=PokemonGQL.from_dto(card.pokemon) if card.pokemon else None,
         )

@@ -112,7 +112,7 @@ class CardDTO:
     rarity: str
     type: str
     set: SetDTO
-    pokemon: PokemonDTO
+    pokemon: PokemonDTO | None = None
 
     @classmethod
     def from_orm(cls, card: models.Card) -> "CardDTO":
@@ -120,8 +120,8 @@ class CardDTO:
             id=card.id,
             name=card.name,
             number=card.number,
-            rarity=card.rarity,
-            type=card.type,
+            rarity=card.rarity.value,
+            type=card.type.value,
             set=SetDTO.from_orm(card.set),
-            pokemon=PokemonDTO.from_orm(card.pokemon),
+            pokemon=PokemonDTO.from_orm(card.pokemon) if card.pokemon else None,
         )

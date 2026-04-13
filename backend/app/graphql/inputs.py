@@ -11,6 +11,17 @@ class PokemonCreationInput:
 
 
 @strawberry.input
+class CardCreationInput:
+    name: str
+    number: int
+    rarity: str
+    type: str
+    set_id: int
+    image_path: str = ""
+    pokemon_id: int | None = None
+
+
+@strawberry.input
 class PokemonFilter:
     name_regex: Optional[str] = None
     number: Optional[int] = None
@@ -25,3 +36,11 @@ class SetFilter:
     era_id: Optional[int] = None
     abbreviation: Optional[str] = None
     year: Optional[int] = None
+
+
+@strawberry.input
+class CardFilter:
+    name_regex: Optional[str] = None
+    rarity: Optional[List[str]] = None
+    set_id: Optional[int] = None
+    pokemon_id: Optional[int] = None

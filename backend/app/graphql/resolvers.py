@@ -2,7 +2,7 @@ from typing import List, Optional
 from strawberry.types import Info
 from sqlalchemy.orm import Session
 
-from app.db.schemas import PokemonFilterParams, SetFilterParams
+from app.db.schemas import PokemonFilterParams, SetFilterParams, CardFilterParams
 from app.db.dependencies import get_db
 from app.db import crud
 
@@ -13,8 +13,15 @@ from app.graphql.types import (
     PokemonGenerationGQL,
     EraGQL,
     SetGQL,
+    CardGQL,
 )
-from app.graphql.inputs import PokemonFilter, PokemonCreationInput, SetFilter
+from app.graphql.inputs import (
+    PokemonFilter,
+    PokemonCreationInput,
+    SetFilter,
+    CardCreationInput,
+    CardFilter,
+)
 from datetime import date
 
 
@@ -170,3 +177,32 @@ def delete_set_resolver(id: int) -> bool:
     db: Session = next(get_db())
     deleted = crud.delete_set(db, id)
     return deleted is not None
+
+
+# --- Cards ---
+def get_cards_resolver(filters: Optional[CardFilter] = None) -> List[CardGQL]:
+    db: Session = next(get_db())
+    filter_params: CardFilterParams | None = None
+    if filters:
+        filter_params = CardFilterParams(
+            name_regex=filters.name_regex,
+            rarity=filters.rarity,
+            set_id=filters.set_id,
+            pokemon_id=filters.pokemon_id,
+        )
+    return [CardGQL.from_dto(card) for card in crud.get_cards(db, filter_params)]
+
+
+def create_card_resolver(card: CardCreationInput) -> CardGQL:
+    db: Session = next(get_db())
+    card_dto = crud.create_card(
+        db,
+        card.name,
+        card.number,
+        card.rarity,
+        card.type,
+        card.image_path,
+        card.set_id,
+        card.pokemon_id,
+    )
+    return CardGQL.from_dto(card_dto)

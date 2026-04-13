@@ -17,3 +17,11 @@ class SetFilterParams:
     era_id: Optional[int] = None
     abbreviation: Optional[str] = None
     year: Optional[int] = None
+
+
+@dataclass
+class CardFilterParams:
+    name_regex: Optional[str] = None
+    rarity: Optional[List[str]] = None
+    set_id: Optional[int] = None
+    pokemon_id: Optional[int] = None
