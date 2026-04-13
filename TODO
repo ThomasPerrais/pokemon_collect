@@ -1,0 +1,9 @@
+
+cards: 
+- change pokemon_id for an association table
+- add tags for cards (ex, gx, cristal (3 secrets in AQ))
+- add extra numbering (H1/H32 in AQ, ...)
+- support for multiple tags (secret + holographic, ...)
+
+
+

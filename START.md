@@ -6,6 +6,10 @@
    - User: `pikachu`
    - Password: `dracaufeu2025`
    - Host: `localhost:3306`
+   ```bash
+   mysql -u pikachu -p
+   ```
+
 
 2. **Python 3.12** with Poetry installed
 3. **Flutter SDK** installed
@@ -59,6 +63,17 @@
    flutter run -d chrome   # For web
    flutter run -d ios       # For iOS simulator
    ```
+## Apply Migration
+
+1. create a new migration
+```bash
+poetry run alembic revision -m "create users table"
+```
+2. review created migration script
+3. apply migration
+```bash
+poetry run alembic upgrade head
+```
 
 ## Quick Test
 
@@ -90,3 +105,9 @@ Once both are running:
 - **No data showing**: Make sure you have Pokemon data in your database
 - **CORS errors**: The backend already has CORS enabled for all origins in dev mode
 
+## Resources:
+
+REST API + GraphQL API (not working): https://tcgdex.dev/
+wiki-like: https://bulbapedia.bulbagarden.net/wiki/Main_Page
+https://www.tcgcollector.com/ -> to test
+https://www.pokecardex.com/
