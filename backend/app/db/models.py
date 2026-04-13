@@ -1,7 +1,7 @@
 from app.db.database import Base
 import enum
 
-from sqlalchemy import String, ForeignKey, and_
+from sqlalchemy import String, ForeignKey, UniqueConstraint
 from sqlalchemy_enum34 import EnumType
 
 from sqlalchemy import Date, Integer, Numeric
@@ -154,6 +154,11 @@ class Pokemon(Base):
         """Pokemon this one evolves from."""
         return [evo.from_pokemon for evo in self.evolutions_to]
 
+    # add unique key constraint on name
+    __table_args__ = (
+        UniqueConstraint("name", name="uq_pokemon_name"),
+    )
+
 
 class Era(Base):
     """
@@ -166,6 +171,11 @@ class Era(Base):
     name: Mapped[str] = mapped_column(String(255))
     sets: Mapped[list["Set"]] = relationship(
         back_populates="era", cascade="all, delete-orphan"
+    )
+
+    # add unique key constraint on name
+    __table_args__ = (
+        UniqueConstraint("name", name="uq_era_name"),
     )
 
 
@@ -193,6 +203,12 @@ class Set(Base):
         secondary="set_star_pokemon", back_populates="star_in_sets"
     )
 
+    # add unique key constraint on name
+    __table_args__ = (
+        UniqueConstraint("name", name="uq_set_name"),
+        UniqueConstraint("abbreviation", name="uq_set_abbreviation"),
+    )
+
 
 class SetStarPokemon(Base):
     """
@@ -217,7 +233,10 @@ class Card(Base):
     class CardType(enum.Enum):
         pokemon = "pokemon"
         object = "object"
-        supporter = "supporter"
+        trainer = "trainer"
+        stadium = "stadium"
+        energy = "energy"
+        tool = "tool"
 
     class CardRarity(enum.Enum):
         common = "common"
@@ -233,6 +252,8 @@ class Card(Base):
         mega_hyper_rare = "mega_hyper_rare"  # <ME: méga-evolutions gold cards.
         special_rare = "special_rare"  # other categories of rare cards (e.g. black/white rare in BLK and WHT).
         shiny = "shiny"
+        rainbow_rare = "rainbow_rare"
+        gold_rare = "gold_rare"
         double_shiny = "double_shiny"
         promo = "promo"
         tech = "tech"
@@ -253,5 +274,226 @@ class Card(Base):
     )
     pokemon: Mapped["Pokemon"] = relationship(back_populates="cards")
 
+    __table_args__ = (
+        UniqueConstraint("set_id", "number", name="uq_card_set_number"),
+    )
+
+
+class AbstractBooster(Base):
+    """
+    ORM model for the 'abstract_booster' table
+    Represents an abstract booster related to a pokemon set
+    """
+
+    __tablename__ = "abstract_booster"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    set_id: Mapped[int] = mapped_column(ForeignKey("set.id"))
+    card_count: Mapped[int]
+
+    __table_args__ = (
+        UniqueConstraint("set_id", "card_count", name="uq_card_number_booster"),
+    )
+
+
+class Booster(Base):
+    """
+    ORM model for the 'booster' table.
+    Represent one of the booster illustration of a pokemon set
+    """
+
+    __tablename__ = "booster"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    abstract_booster_id: Mapped[int] = mapped_column(ForeignKey("abstract_booster.id"))
+    name: Mapped[str] = mapped_column(String(255))
+
+
+class BoosterPokemon(Base):
+    """
+    ORM model for the "booster_pokemon" association table.
+    This table stores the pokemons illustrated on each booster
+    """
+
+    __tablename__ = "booster_pokemon"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    pokemon_id: Mapped[int] = mapped_column(ForeignKey("pokemon.id"))
+    booster_id: Mapped[int] = mapped_column(ForeignKey("booster.id"))
+
+
+class Item(Base):
+    """
+    ORM model for the 'item' table.
+    Represents an abstract pokemon item commercialized
+    """
+
+    __tablename__ = "item"
+
+    class ItemType(enum.Enum):
+        blister = "blister"
+        booster = "booster"
+        duopack = "duopack"
+        tripack = "tripack"
+        pokebox = "pokebox"
+        coffret = "coffret"
+        half_display = "half_display"
+        display = "display"
+        ETB = "ETB"
+        bundle = "bundle"
+        mini_tin = "mini_tin"
+        art_set = "art_set"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(255))
+    type: Mapped[ItemType] = mapped_column(EnumType(ItemType))
+    retail_price: Mapped[float] = mapped_column(Numeric(7, 2))
+    release_date: Mapped[Date] = mapped_column(Date)
+
+
+class ItemPokemon(Base):
+    """
+    ORM model for the "item_pokemon" association table.
+    This table stores the pokemons illustrated on each item
+    """
+
+    __tablename__ = "item_pokemon"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    pokemon_id: Mapped[int] = mapped_column(ForeignKey("pokemon.id"))
+    item_id: Mapped[int] = mapped_column(ForeignKey("item.id"))
+
+
+class ItemAbstractContent(Base):
+    """
+    ORM model for the 'item_abstract_content' table.
+    This table stores the content of every pokemon item in terms of abstract boosters
+    """
+
+    __tablename__ = "item_abstract_content"
+    
+    id: Mapped[int] = mapped_column(primary_key=True)
+    item_id: Mapped[int] = mapped_column(ForeignKey("item.id"))
+    abstract_booster_id: Mapped[int] = mapped_column(ForeignKey("abstract_booster.id"))
+    quantity: Mapped[int]
+
+
+class ItemExactContent(Base):
+    """
+    ORM model for the 'item_exact_content' table.
+    This table stores the content of every pokemon item in terms of exact boosters illustrations
+    """
+
+    __tablename__ = "item_exact_content"
+    
+    id: Mapped[int] = mapped_column(primary_key=True)
+    item_id: Mapped[int] = mapped_column(ForeignKey("item.id"))
+    booster_id: Mapped[int] = mapped_column(ForeignKey("booster.id"))
+    quantity: Mapped[int]
+
+
+class ItemExactCardContent(Base):
+    """
+    ORM model for the 'item_exact_card_content' table.
+    This table stores the promo cards contained in every pokemon item
+    """
+    
+    __tablename__ = "item_exact_card_content"
+    
+    id: Mapped[int] = mapped_column(primary_key=True)
+    item_id: Mapped[int] = mapped_column(ForeignKey("item.id"))
+    card_id: Mapped[int] = mapped_column(ForeignKey("card.id"))
+    quantity: Mapped[int]
+
+
+class User(Base):
+    """
+    ORM model for the 'user' table.
+    This table stores user information
+    """
+
+    __tablename__ = "user"
+
+    username: Mapped[str] = mapped_column(String(255))
+    email: Mapped[str] = mapped_column(String(255))
+    created_at: Mapped[Date] = mapped_column(Date)
+
+    __table_args__ = (
+        UniqueConstraint("email", name="uq_user_email"),
+    )
 
 # TODO: remaining tables!!
+# Table user {
+#   id serial pk
+#   username varchar [unique, not null]
+#   email varchar [unique, not null]
+#   created_at timestamp [default: `now()`]
+# }
+
+# Table user_item {
+#   id serial pk
+#   user_id int [ref: > user.id, not null]
+#   item_id int [ref: > item.id ,not null]
+#   name varchar
+# }
+
+# Table user_card {
+#   id serial pk
+#   user_id int [ref: > user.id, not null]
+#   card_id int [ref: > card.id, not null]
+#   booster_opening_id int [ref: > user_booster_opening.id]
+# }
+
+# Table user_item_condition {
+#   id serial pk
+#   user_item_id int [ref: > user_item.id, not null]
+#   date timestamp [default: "now()"]
+#   condition sealed_item_condition
+# }
+
+# Table user_card_condition {
+#   id serial pk
+#   user_card_id int [ref: > user_card.id, not null]
+#   date timestamp [default: "now()"]
+#   condition card_condition
+# }
+
+# Enum transaction {
+#   buy
+#   sell
+# }
+
+# Table user_item_transaction {
+#   id serial pk
+#   user_item_id int [ref: > user_item.id, not null]
+#   type transaction
+#   counterparty varchar
+# }
+
+# Table user_card_transaction {
+#   id serial pk
+#   user_card_id int [ref: > user_card.id, not null]
+#   type transaction
+#   counterparty varchar
+# }
+
+# Table user_booster_opening {
+#   id serial pk
+#   date date
+#   serie int [ref: > serie.id, not null]
+#   item int [ref: > user_item.id, not null]
+# }
+
+
+# Table gradation_service {
+#   id serial pk
+#   name varchar
+#   country varchar
+# }
+
+# Table gradation {
+#   id serial pk
+#   card_id int [ref: > user_card.id, not null]
+#   service gradation_service
+
+# }
