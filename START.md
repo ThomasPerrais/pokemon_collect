@@ -11,7 +11,7 @@
    ```
 
 
-2. **Python 3.12** with Poetry installed
+2. **Python 3.12** with [uv](https://docs.astral.sh/uv/) installed (`curl -LsSf https://astral.sh/uv/install.sh | sh` or `brew install uv`)
 3. **Flutter SDK** installed
 
 ## Step 1: Start the Backend
@@ -23,17 +23,17 @@
 
 2. Install dependencies (if not already done):
    ```bash
-   poetry install
+   uv sync
    ```
 
 3. Make sure database migrations are applied:
    ```bash
-   poetry run alembic upgrade head
+   uv run alembic upgrade head
    ```
 
 4. Start the FastAPI server:
    ```bash
-   poetry run uvicorn app.main:app --reload --port 8000
+   uv run uvicorn app.main:app --reload --port 8000
    ```
 
    The backend will be available at:
@@ -67,12 +67,12 @@
 
 1. create a new migration
 ```bash
-poetry run alembic revision -m "create users table"
+uv run alembic revision -m "create users table"
 ```
 2. review created migration script
 3. apply migration
 ```bash
-poetry run alembic upgrade head
+uv run alembic upgrade head
 ```
 
 ## Quick Test

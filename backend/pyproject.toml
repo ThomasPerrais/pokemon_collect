@@ -1,36 +1,37 @@
-[tool.poetry]
+[project]
 name = "poke-collect"
 version = "0.1.0"
 description = "Organise your Pokemon cards and sealed item collection"
-authors = ["Thomas PERRAIS"]
-readme = "README.md"
-packages = [{include = "app", from="."}]
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "fastapi>=0.118.3,<0.119",
+    "uvicorn>=0.37,<0.38",
+    "sqlalchemy>=2.0.44,<2.1",
+    "strawberry-graphql[fastapi]>=0.283.2,<0.284",
+    "mypy>=1.18.2,<2",
+    "sqlalchemy-enum34>=2.0,<3",
+    "pymysql>=1.1.2,<2",
+    "alembic>=1.17.1,<2",
+    "cryptography>=46.0.3,<47",
+    "pandas>=2.3.3,<3",
+    "requests>=2.32.5,<3",
+    "unidecode>=1.4,<2",
+]
 
-[tool.poetry.dependencies]
-python = "3.12.*"
-fastapi = "^0.118.3"
-uvicorn = "^0.37.0"
-sqlalchemy = "^2.0.44"
-strawberry-graphql = {extras = ["fastapi"], version = "^0.283.2"}
-mypy = "^1.18.2"
-sqlalchemy-enum34 = "^2.0.0"
-pymysql = "^1.1.2"
-alembic = "^1.17.1"
-cryptography = "^46.0.3"
-pandas = "^2.3.3"
-requests = "^2.32.5"
-unidecode = "^1.4.0"
-
-[[tool.poetry.source]]
-name = "pypi"
-priority = "primary"
-
-[tool.poetry.group.dev.dependencies]
-mypy-boto3-s3 = "^1.38.0"
-black = "^23.11.0"
-flake8 = "^6.1.0"
-pytype = "^2024.1.24"
+[dependency-groups]
+dev = [
+    "mypy-boto3-s3>=1.38,<2",
+    "black>=23.11,<24",
+    "flake8>=6.1,<7",
+    "pytype>=2024.1.24",
+]
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling>=1.26.0"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["app"]
+
+[tool.uv]
+default-groups = ["dev"]

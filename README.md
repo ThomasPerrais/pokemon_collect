@@ -19,12 +19,12 @@ frontend: Flutter
 In order to run a migration after a change in the models.py the following line should be executed from
 within the backend folder:
 
-'''
-poetry run alembic revision --autogenerate -m "<migration message>"
-'''
+```bash
+uv run alembic revision --autogenerate -m "<migration message>"
+```
 
-then to aply the migration to actual data in the MySQL database
+then to apply the migration to actual data in the MySQL database
 
-'''
-poetry run alembic upgrade head
-'''
+```bash
+uv run alembic upgrade head
+```
