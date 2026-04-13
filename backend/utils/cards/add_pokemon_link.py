@@ -4,7 +4,8 @@ import requests
 import re
 import unidecode
 
-from utils.constants import GRAPHQL_URL, HEADERS, BASE_DIR
+from utils.constants import GRAPHQL_URL, HEADERS
+from utils.io import read_objects_from_array_json
 
 
 SPECIAL_CASES = {
@@ -44,6 +45,23 @@ SPECIAL_CASES = {
     "ursaking lune vermeille": ("Ursaking - lune vermeille", 1142),
     "poltchageist": ("Poltchageist - forme imitation", 1271),
     "theffroyable": ("Théffroyable - forme médiocre", 1273),
+    "shifours mille poings": ("Shifours - style mille poings", 1129),
+    "shifours poing final": ("Shifours - style point final", 1127),
+    "dialga originel": ("Dialga - forme originelle", 610),
+    "palkia originel": ("Palkia - forme originelle", 612),
+    "qwilpik de hisui": ("Qwilpik", 1146),  # TODO: add 'hisui' tag for those pokemons
+    "farfurex de hisui": ("Farfurex", 1145),
+    "sylveroy cavalier du froid": ("Sylveroy - cavalier du froid", 1137),
+    "sylveroy cavalier d'effroi": ("Sylveroy - cavalier d'effroi", 1138),
+    "m. glaquette de galar": ("M. Glaquette", 1094),
+    "ixon de galar": ("Ixon", 1090),  # TODO : add 'galar' tag for those pokemons
+    "corayome de galar": ("Corayôme", 1092),
+    "tutetekri de galar": ("Tutétékri", 1095),
+    "palarticho de galar": ("Palarticho", 1093),
+    "berserkatt de galar": ("Berserkatt", 1091),
+    "morpheo forme solaire": ("Morphéo - forme solaire", 445),
+    "morpheo forme eau de pluie": ("Morphéo - forme eau de pluie", 446),
+    "morpheo forme blizzard": ("Morphéo - forme blizzard", 447),
 }
 
 
@@ -91,13 +109,21 @@ def normalize_card_name(name: str) -> str:
     # name = re.sub(" de pierre$", "", name).strip()
 
     # special case of JTG: remove "de N", "de Mashynn", "de Lilie", "de Nabil"
-    name = re.sub(" de n$", "", name).strip()
-    name = re.sub(" de mashynn$", "", name).strip()
-    name = re.sub(" de lilie$", "", name).strip()
-    name = re.sub(" de nabil$", "", name).strip()
+    # name = re.sub(" de n$", "", name).strip()
+    # name = re.sub(" de mashynn$", "", name).strip()
+    # name = re.sub(" de lilie$", "", name).strip()
+    # name = re.sub(" de nabil$", "", name).strip()
+
     
     # # remove suffix ex, gx, vmax, vstar, v, etc...
-    name = re.sub(" (ex|gx|vmax|vstar)$", "", name).strip()
+    name = re.sub(" ex$", "", name).strip()  # EV and onward
+    name = re.sub("-(v|vmax|vstar)$", "", name).strip()  # EB
+    name = re.sub(" radieux$", "", name).strip()  # EB
+
+    # special cases CEL ()
+    name = re.sub("-ex", "", name).strip()
+    name = re.sub(" (volant|surfeur|obscur|de rocket|brillant|de team magma|ex especes delta|star|gl niv\.x|c niv\.x)$", "", name).strip()
+    
     return name
 
 
@@ -128,11 +154,6 @@ def query_pokemons() -> dict[str, tuple[str, int]]:
     return pokemons
 
 
-def read_cards_from_json(file_path: str) -> list[dict]:
-    with open(file_path, "r", encoding="utf-8") as file:
-        return json.load(file)
-
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Add pokemon link to cards using populated database of pokemons")
     parser.add_argument("pokemon_set", type=str, help="Pokemon set name (e.g. 'EV01' or 'ME01')")
@@ -144,7 +165,7 @@ if __name__ == "__main__":
     from pathlib import Path
     folder = Path("samples")
 
-    cards = read_cards_from_json(str(folder / f"{args.pokemon_set}.json"))
+    cards = read_objects_from_array_json(str(folder / f"{args.pokemon_set}.json"))
     pokemons = query_pokemons()
 
     print(f"Number of cards: {len(cards)}")

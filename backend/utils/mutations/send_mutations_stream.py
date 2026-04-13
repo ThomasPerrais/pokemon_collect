@@ -1,12 +1,10 @@
 import requests
 import json
-import os
+from pathlib import Path
 from utils.constants import GRAPHQL_URL, HEADERS, BASE_DIR
 
-os.chdir(BASE_DIR)
 
-
-with open(BASE_DIR / "mutations" / "pokemons_test.txt", "r") as f:
+with open(Path("samples") / "CRZ.graphql", "r") as f:
     mutations = f.readlines()
 
 
