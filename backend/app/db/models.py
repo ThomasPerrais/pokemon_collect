@@ -2,11 +2,10 @@ from app.db.database import Base
 import enum
 
 from sqlalchemy import String, ForeignKey, UniqueConstraint
-from sqlalchemy_enum34 import EnumType
 
-from sqlalchemy import Date, Integer, Numeric
+from sqlalchemy import Date, Numeric
 from sqlalchemy.orm import Mapped
-from sqlalchemy.orm import mapped_column, relationship, foreign
+from sqlalchemy.orm import mapped_column, relationship
 
 
 class PokemonGeneration(Base):
@@ -233,7 +232,8 @@ class Card(Base):
     class CardType(enum.Enum):
         pokemon = "pokemon"
         object = "object"
-        trainer = "trainer"
+        supporter = "supporter"
+        # trainer = "trainer"
         stadium = "stadium"
         energy = "energy"
         tool = "tool"
@@ -261,8 +261,8 @@ class Card(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(255))
     number: Mapped[int]
-    rarity: Mapped[CardRarity] = mapped_column(EnumType(CardRarity))
-    type: Mapped[CardType] = mapped_column(EnumType(CardType))
+    rarity: Mapped[CardRarity]
+    type: Mapped[CardType]
 
     image_path: Mapped[str] = mapped_column(String(255))
 
@@ -346,7 +346,7 @@ class Item(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(255))
-    type: Mapped[ItemType] = mapped_column(EnumType(ItemType))
+    type: Mapped[ItemType]
     retail_price: Mapped[float] = mapped_column(Numeric(7, 2))
     release_date: Mapped[Date] = mapped_column(Date)
 
@@ -414,6 +414,7 @@ class User(Base):
 
     __tablename__ = "user"
 
+    id: Mapped[int] = mapped_column(primary_key=True)
     username: Mapped[str] = mapped_column(String(255))
     email: Mapped[str] = mapped_column(String(255))
     created_at: Mapped[Date] = mapped_column(Date)
