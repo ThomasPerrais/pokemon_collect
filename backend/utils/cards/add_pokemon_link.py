@@ -62,6 +62,8 @@ SPECIAL_CASES = {
     "morpheo forme solaire": ("Morphéo - forme solaire", 445),
     "morpheo forme eau de pluie": ("Morphéo - forme eau de pluie", 446),
     "morpheo forme blizzard": ("Morphéo - forme blizzard", 447),
+    "raflesia": ("Rafflesia", 64),
+    "rafflesia": ("Rafflesia", 64),
 }
 
 
@@ -97,6 +99,8 @@ def normalize_card_name(name: str) -> str:
     1. Normalize the name to lowercase without accents
     2. Remove suffix ex, gx, vmax, vstar, v, etc.
     """
+    name = name.replace(" ♂", " mâle").replace(" ♀", " femelle")
+    name = name.replace(" δ", "")
     name = _normalize_name(name)
     
     # # special case of DRI: remove "de la Team Rocket", "de Luth", "de Cynthia"...
@@ -114,6 +118,15 @@ def normalize_card_name(name: str) -> str:
     # name = re.sub(" de lilie$", "", name).strip()
     # name = re.sub(" de nabil$", "", name).strip()
 
+    # N4 special case: remove " lumineux" and " [a-z]" (zarbi)
+    # name = re.sub(" lumineux$", "", name).strip()
+    # name = re.sub(" [a-z]$", "", name).strip()
+
+    # DS special case: remove " d'holon"
+    # name = re.sub(" d'holon$", "", name).strip()
+
+    # MA special case: remove "  de team aqua"
+    name = re.sub(" de team aqua$", "", name).strip()
     
     # # remove suffix ex, gx, vmax, vstar, v, etc...
     name = re.sub(" ex$", "", name).strip()  # EV and onward
@@ -122,7 +135,7 @@ def normalize_card_name(name: str) -> str:
 
     # special cases CEL ()
     name = re.sub("-ex", "", name).strip()
-    name = re.sub(" (volant|surfeur|obscur|de rocket|brillant|de team magma|ex especes delta|star|gl niv\.x|c niv\.x)$", "", name).strip()
+    name = re.sub(" (volant|surfeur|obscur|de rocket|brillant|de team magma|ex especes delta|delta|star|gl niv\.x|c niv\.x)$", "", name).strip()
     
     return name
 
