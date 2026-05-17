@@ -195,13 +195,13 @@ if __name__ == "__main__":
         if pokemon_card_name not in pokemons:
             print(f"Pokemon card name {pokemon_card_name} not found in pokemons")
             not_found_pokemon_cards += 1
-            card["pokemon"] = ""
-            card["pokemon_id"] = -1
+            card["pokemons"] = ""
+            card["pokemon_ids"] = []
             continue
 
         pokemon_name, pokemon_id = pokemons[pokemon_card_name]
-        card["pokemon"] = pokemon_name
-        card["pokemon_id"] = pokemon_id
+        card["pokemons"] = pokemon_name
+        card["pokemon_ids"] = [pokemon_id]
 
     print(f"Linked: {pokemon_cards - not_found_pokemon_cards} / {pokemon_cards}")
 

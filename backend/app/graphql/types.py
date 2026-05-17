@@ -123,7 +123,7 @@ class CardGQL:
     rarity: str
     type: str
     set: SetGQL
-    pokemon: PokemonGQL | None = None
+    pokemons: list[PokemonGQL]
 
     @classmethod
     def from_dto(cls, card: CardDTO) -> "CardGQL":
@@ -134,5 +134,5 @@ class CardGQL:
             rarity=card.rarity,
             type=card.type,
             set=SetGQL.from_dto(card.set),
-            pokemon=PokemonGQL.from_dto(card.pokemon) if card.pokemon else None,
+            pokemons=[PokemonGQL.from_dto(pokemon) for pokemon in card.pokemons],
         )

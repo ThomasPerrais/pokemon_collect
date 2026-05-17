@@ -67,7 +67,7 @@ if __name__ == "__main__":
             for card in cards:
                 if card["type"] == "pokemon":
                     f.write(
-                        f"mutation {{createCard(card: {{name: \"{card['name']}\", number: {card['number']}, rarity: \"{card['rarity']}\", type: \"{card['type']}\", setId: {set_id}, pokemonId: {card['pokemon_id']}}}){{name}}}}"
+                        f"mutation {{createCard(card: {{name: \"{card['name']}\", number: {card['number']}, rarity: \"{card['rarity']}\", type: \"{card['type']}\", setId: {set_id}, pokemonIds: {card['pokemon_ids']}}}){{name}}}}"
                     )
                 else:
                     f.write(

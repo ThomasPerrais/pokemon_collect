@@ -1,11 +1,12 @@
 from app.db.models import Pokemon, PokemonType, PokemonTag, Set, Card
 from sqlalchemy.sql import Select
 from sqlalchemy import and_
+from sqlalchemy.sql.elements import ColumnElement
 from app.db.schemas import PokemonFilterParams, SetFilterParams, CardFilterParams
 
 
 def apply_pokemon_filters(stmt: Select, filters: PokemonFilterParams) -> Select:
-    conditions = []
+    conditions: list[ColumnElement[bool]] = []
     if filters.name_regex:
         conditions.append(Pokemon.name.like(f"%{filters.name_regex}%"))
     if filters.number:
@@ -26,7 +27,7 @@ def apply_pokemon_filters(stmt: Select, filters: PokemonFilterParams) -> Select:
 
 
 def apply_set_filters(stmt: Select, filters: SetFilterParams) -> Select:
-    conditions = []
+    conditions: list[ColumnElement[bool]] = []
     if filters.name_regex:
         conditions.append(Set.name.like(f"%{filters.name_regex}%"))
     if filters.era_id:
@@ -42,7 +43,7 @@ def apply_set_filters(stmt: Select, filters: SetFilterParams) -> Select:
 
 
 def apply_card_filters(stmt: Select, filters: CardFilterParams) -> Select:
-    conditions = []
+    conditions: list[ColumnElement[bool]] = []
     if filters.name_regex:
         conditions.append(Card.name.like(f"%{filters.name_regex}%"))
     if filters.rarity:
@@ -50,7 +51,7 @@ def apply_card_filters(stmt: Select, filters: CardFilterParams) -> Select:
     if filters.set_id:
         conditions.append(Card.set_id == filters.set_id)
     if filters.pokemon_id:
-        conditions.append(Card.pokemon_id == filters.pokemon_id)
+        conditions.append(Card.pokemons.any(Pokemon.id == filters.pokemon_id))
 
     if conditions:
         stmt = stmt.where(and_(*conditions))

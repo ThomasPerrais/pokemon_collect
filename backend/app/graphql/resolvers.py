@@ -203,6 +203,6 @@ def create_card_resolver(card: CardCreationInput) -> CardGQL:
         card.type,
         card.image_path,
         card.set_id,
-        card.pokemon_id,
+        card.pokemon_ids,
     )
     return CardGQL.from_dto(card_dto)

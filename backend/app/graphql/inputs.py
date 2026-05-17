@@ -18,7 +18,7 @@ class CardCreationInput:
     type: str
     set_id: int
     image_path: str = ""
-    pokemon_id: int | None = None
+    pokemon_ids: List[int] = strawberry.field(default_factory=list)
 
 
 @strawberry.input

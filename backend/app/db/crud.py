@@ -240,7 +240,7 @@ def create_card(
     type: str,
     image_path: str,
     set_id: int,
-    pokemon_id: int | None,
+    pokemon_ids: list[int],
 ) -> dto.CardDTO:
     stmt = select(Set).where(Set.id == set_id)
     set = db.scalars(stmt).one_or_none()
@@ -252,12 +252,12 @@ def create_card(
     except ValueError:
         raise Exception("unknown card type")
     
-    pokemon = None
-    if pokemon_id:
-        stmt = select(Pokemon).where(Pokemon.id == pokemon_id)
-        pokemon = db.scalars(stmt).one_or_none()
-        if not pokemon:
-            raise Exception("Pokemon not found")
+    pokemons: list[Pokemon] = []
+    if pokemon_ids:
+        stmt = select(Pokemon).where(Pokemon.id.in_(pokemon_ids))
+        pokemons = db.scalars(stmt).all()
+        if len(pokemons) != len(pokemon_ids):
+            raise Exception("One or more Pokemons not found")
     elif card_type == Card.CardType.pokemon:
         raise Exception("Pokemon card must have a pokemon")
 
@@ -273,7 +273,7 @@ def create_card(
         type=card_type,
         image_path=image_path,
         set=set,
-        pokemon=pokemon,
+        pokemons=pokemons,
     )
 
     try:

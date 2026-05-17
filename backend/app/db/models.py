@@ -112,7 +112,7 @@ class Pokemon(Base):
 
     image_path: Mapped[str] = mapped_column(String(255), nullable=True)
     cards: Mapped[list["Card"]] = relationship(
-        back_populates="pokemon", cascade="all, delete-orphan"
+        secondary="card_pokemon_association", back_populates="pokemons"
     )
 
     types: Mapped[list["PokemonType"]] = relationship(
@@ -221,6 +221,16 @@ class SetStarPokemon(Base):
     pokemon_id: Mapped[int] = mapped_column(ForeignKey("pokemon.id"))
 
 
+class CardPokemon(Base):
+    """
+    Association table for many-to-many relationship between Card and Pokemon.
+    """
+
+    __tablename__ = "card_pokemon_association"
+    card_id: Mapped[int] = mapped_column(ForeignKey("card.id"), primary_key=True)
+    pokemon_id: Mapped[int] = mapped_column(ForeignKey("pokemon.id"), primary_key=True)
+
+
 class Card(Base):
     """
     ORM model for the 'card' table.
@@ -269,10 +279,9 @@ class Card(Base):
     set_id: Mapped[int] = mapped_column(ForeignKey("set.id"))
     set: Mapped["Set"] = relationship(back_populates="cards")
 
-    pokemon_id: Mapped[int | None] = mapped_column(
-        ForeignKey("pokemon.id"), nullable=True
+    pokemons: Mapped[list["Pokemon"]] = relationship(
+        secondary="card_pokemon_association", back_populates="cards"
     )
-    pokemon: Mapped["Pokemon"] = relationship(back_populates="cards")
 
     __table_args__ = (
         UniqueConstraint("set_id", "number", name="uq_card_set_number"),
