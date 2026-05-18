@@ -14,8 +14,18 @@ SPECIAL_CASES = {
     "sivallie": ("Sivallié - type normal", 965),
     "tauros de paldea": ("Tauros - forme de paldéa - race combattive", 181),
     "deoxys": ("Deoxys - forme normale", 492),
+    "deoxys forme normale": ("Deoxys - forme normale", 492),
+    "deoxys forme attaque": ("Deoxys - forme attaque", 493),
+    "deoxys forme defense": ("Deoxys - forme defense", 494),
+    "deoxys forme vitesse": ("Deoxys - forme vitesse", 495),
     "cheniti": ("Cheniti - cape plante", 521),
+    "cheniti cape plante": ("Cheniti - cape plante", 521),
+    "cheniti cape sable": ("Cheniti - cape sable", 522),
+    "cheniti cape dechet": ("Cheniti - cape dechet", 523),
     "cheniselle": ("Cheniselle - cape plante", 524),
+    "cheniselle cape plante": ("Cheniselle - cape plante", 524),
+    "cheniselle cape sable": ("Cheniselle - cape sable", 525),
+    "cheniselle cape dechet": ("Cheniselle - cape dechet", 526),
     "ceriflor": ("Ceriflor - temps couvert", 534),
     "sancoki": ("Sancoki - mer occident", 536),
     "tritosor": ("Tritosor - mer occident", 538),
@@ -49,21 +59,30 @@ SPECIAL_CASES = {
     "shifours poing final": ("Shifours - style point final", 1127),
     "dialga originel": ("Dialga - forme originelle", 610),
     "palkia originel": ("Palkia - forme originelle", 612),
-    "qwilpik de hisui": ("Qwilpik", 1146),  # TODO: add 'hisui' tag for those pokemons
+    "qwilpik de hisui": ("Qwilpik", 1146),
     "farfurex de hisui": ("Farfurex", 1145),
     "sylveroy cavalier du froid": ("Sylveroy - cavalier du froid", 1137),
     "sylveroy cavalier d'effroi": ("Sylveroy - cavalier d'effroi", 1138),
     "m. glaquette de galar": ("M. Glaquette", 1094),
-    "ixon de galar": ("Ixon", 1090),  # TODO : add 'galar' tag for those pokemons
+    "ixon de galar": ("Ixon", 1090),
     "corayome de galar": ("Corayôme", 1092),
     "tutetekri de galar": ("Tutétékri", 1095),
     "palarticho de galar": ("Palarticho", 1093),
     "berserkatt de galar": ("Berserkatt", 1091),
     "morpheo forme solaire": ("Morphéo - forme solaire", 445),
+    "morpheo soleil": ("Morphéo - forme solaire", 445),
     "morpheo forme eau de pluie": ("Morphéo - forme eau de pluie", 446),
+    "morpheo pluie": ("Morphéo - forme eau de pluie", 446),
     "morpheo forme blizzard": ("Morphéo - forme blizzard", 447),
+    "morpheo neige": ("Morphéo - forme blizzard", 447),
     "raflesia": ("Rafflesia", 64),
     "rafflesia": ("Rafflesia", 64),
+    "necrozma ailes de l'aurore": ("Necrozma - ailes de l'aurore", 1011),
+    "necrozma criniere du couchant": ("Nécrozma - crinière du couchant", 1010),
+    "tritosor mer orient": ("Tritosor - mer orient", 539),
+    "tritosor mer occident": ("Tritosor - mer occident", 538),
+    "sancoki mer orient": ("Sancoki - mer orient", 537),
+    "sancoki mer occident": ("Sancoki - mer occident", 536),
 }
 
 
@@ -92,7 +111,7 @@ def normalize_pokemon_name(name: str) -> str:
     return name
 
 
-def normalize_card_name(name: str) -> str:
+def extract_pokemons(name: str) -> list[str]:
     """
     Normalize and standardize the card name
     Steps:
@@ -126,18 +145,31 @@ def normalize_card_name(name: str) -> str:
     # name = re.sub(" d'holon$", "", name).strip()
 
     # MA special case: remove "  de team aqua"
-    name = re.sub(" de team aqua$", "", name).strip()
+    # name = re.sub(" de team aqua$", "", name).strip()
+
+    # name = re.sub(" radieux$", "", name).strip()  # EB
+    # name = re.sub(" prisme etoile$", "", name).strip()  # TEU
+    # name = re.sub(" brillant$", "", name).strip()  # SLE
+    
+    # name = re.sub(" (turbo|volant|surfeur)$", "", name).strip()  # EVO
+    # name = re.sub(" (turbo)$", "", name).strip()  # STS, FAC, GNR, BKP, BKT
+    # name = re.sub(" (de la team aqua|de la team magma)$", "", name).strip()  # DCR
+    
+    # name = re.sub(" legende$", "", name).strip()  # HGSS
+
+    # name = re.sub(" (volant|surfeur|gl|g|fb|4|c|gl niv\.x|g niv\.x|c niv\.x|fb niv\.x|4 niv\.x)$", "", name).strip()
+    # name = re.sub(" [a-z!\?]$", "", name).strip()  # zarbi
+    
+    # special cases CEL ()
+    # name = re.sub(" (volant|surfeur|obscur|de rocket|brillant|de team magma|ex especes delta|delta|star|gl niv\.x|c niv\.x)$", "", name).strip()
     
     # # remove suffix ex, gx, vmax, vstar, v, etc...
-    name = re.sub(" ex$", "", name).strip()  # EV and onward
-    name = re.sub("-(v|vmax|vstar)$", "", name).strip()  # EB
-    name = re.sub(" radieux$", "", name).strip()  # EB
+    name = re.sub("^m-", "", name).strip()
+    name = re.sub("[- ](ex|gx|v|vmax|vstar|niv\.x|lv\.36)$", "", name).strip()
 
-    # special cases CEL ()
-    name = re.sub("-ex", "", name).strip()
-    name = re.sub(" (volant|surfeur|obscur|de rocket|brillant|de team magma|ex especes delta|delta|star|gl niv\.x|c niv\.x)$", "", name).strip()
-    
-    return name
+    name = re.sub(", ", " et ", name).strip()
+    name = re.sub(" & ", " et ", name).strip()
+    return name.split(" et ")
 
 
 def query_pokemons() -> dict[str, tuple[str, int]]:
@@ -185,25 +217,33 @@ if __name__ == "__main__":
     print(f"Number of pokemons: {len(pokemons)}")
 
     pokemon_cards = 0
-    not_found_pokemon_cards = 0
+    error_card = 0
     for card in cards:
         if card["type"] != "pokemon":
             continue
         pokemon_cards += 1
 
-        pokemon_card_name = normalize_card_name(card["name"])
-        if pokemon_card_name not in pokemons:
-            print(f"Pokemon card name {pokemon_card_name} not found in pokemons")
-            not_found_pokemon_cards += 1
-            card["pokemons"] = ""
-            card["pokemon_ids"] = []
-            continue
+        pokemon_card_names = extract_pokemons(card["name"])
+        pokemon_ids = []
+        pokemon_names = []
+        errors = []
+        for pokemon_card_name in pokemon_card_names:
+            if pokemon_card_name not in pokemons:
+                errors.append(f"{pokemon_card_name} not found in pokemons")
+                continue
+            else:
+                pokemon_name, pokemon_id = pokemons[pokemon_card_name]
+                pokemon_names.append(pokemon_name)
+                pokemon_ids.append(pokemon_id)
+        
+        if errors:
+            print(f"Errors for card {card['name']}: {', '.join(errors)}")
+            error_card += 1
 
-        pokemon_name, pokemon_id = pokemons[pokemon_card_name]
-        card["pokemons"] = pokemon_name
-        card["pokemon_ids"] = [pokemon_id]
+        card["pokemons"] = pokemon_names
+        card["pokemon_ids"] = pokemon_ids
 
-    print(f"Linked: {pokemon_cards - not_found_pokemon_cards} / {pokemon_cards}")
+    print(f"Linked: {pokemon_cards - error_card} / {pokemon_cards}")
 
     with open(folder / f"{args.pokemon_set}_linked.json", "w", encoding="utf-8") as file:
         # cards is a list of dicts, save it as a json array with each card on one line
