@@ -105,6 +105,46 @@ class SetDTO:
 
 
 @dataclass
+class AbstractBoosterDTO:
+    id: int
+    card_count: int
+    set: SetDTO
+
+    @classmethod
+    def from_orm(
+        cls, abstract_booster: models.AbstractBooster, set: models.Set
+    ) -> "AbstractBoosterDTO":
+        return cls(
+            id=abstract_booster.id,
+            card_count=abstract_booster.card_count,
+            set=SetDTO.from_orm(set),
+        )
+
+
+@dataclass
+class BoosterDTO:
+    id: int
+    name: str
+    abstract_booster: AbstractBoosterDTO
+    pokemons: List[PokemonDTO]
+
+    @classmethod
+    def from_orm(
+        cls,
+        booster: models.Booster,
+        abstract_booster: models.AbstractBooster,
+        set: models.Set,
+        pokemons: list[models.Pokemon],
+    ) -> "BoosterDTO":
+        return cls(
+            id=booster.id,
+            name=booster.name,
+            abstract_booster=AbstractBoosterDTO.from_orm(abstract_booster, set),
+            pokemons=[PokemonDTO.from_orm(pokemon) for pokemon in pokemons],
+        )
+
+
+@dataclass
 class CardDTO:
     id: int
     name: str

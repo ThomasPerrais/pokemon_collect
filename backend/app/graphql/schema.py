@@ -113,6 +113,19 @@ class Mutation:
     delete_set = strawberry.field(
         resolver=resolvers.delete_set_resolver, description="Delete a Pokémon card set."
     )
+
+    # --- Abstract boosters ---
+    create_abstract_booster = strawberry.field(
+        resolver=resolvers.create_abstract_booster_resolver,
+        description="Create an abstract booster for a set by abbreviation or name.",
+    )
+
+    # --- Boosters ---
+    create_booster = strawberry.field(
+        resolver=resolvers.create_booster_resolver,
+        description="Create a booster illustration from an abstract booster and pokemon ids.",
+    )
+
     # --- Cards ---
     create_card = strawberry.field(
         resolver=resolvers.create_card_resolver,

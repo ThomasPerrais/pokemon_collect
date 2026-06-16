@@ -8,6 +8,9 @@ from app.db.models import (
     Era,
     Set,
     Card,
+    AbstractBooster,
+    Booster,
+    BoosterPokemon,
 )
 from app.db.filters import apply_pokemon_filters, apply_set_filters, apply_card_filters
 from app.db.schemas import PokemonFilterParams, SetFilterParams, CardFilterParams
@@ -219,6 +222,76 @@ def delete_set(db: Session, id: int) -> dto.SetDTO | None:
         db.delete(set)
         db.commit()
     return dto.SetDTO.from_orm(set) if set else None
+
+
+# --- Abstract boosters ---
+def create_abstract_booster(
+    db: Session, card_count: int, set_identifier: str
+) -> dto.AbstractBoosterDTO:
+    stmt = select(Set).where(
+        (Set.abbreviation == set_identifier) | (Set.name == set_identifier)
+    )
+    set = db.scalars(stmt).one_or_none()
+    if not set:
+        raise Exception("Set not found")
+
+    abstract_booster = AbstractBooster(set_id=set.id, card_count=card_count)
+    try:
+        db.add(abstract_booster)
+        db.commit()
+        db.refresh(abstract_booster)
+        return dto.AbstractBoosterDTO.from_orm(abstract_booster, set)
+    except Exception:
+        db.rollback()
+        raise
+
+
+# --- Boosters ---
+def create_booster(
+    db: Session,
+    abstract_booster_id: int,
+    pokemon_ids: list[int],
+    name: str | None = None,
+) -> dto.BoosterDTO:
+    stmt = select(AbstractBooster).where(AbstractBooster.id == abstract_booster_id)
+    abstract_booster = db.scalars(stmt).one_or_none()
+    if not abstract_booster:
+        raise Exception("Abstract booster not found")
+
+    stmt = select(Set).where(Set.id == abstract_booster.set_id)
+    set = db.scalars(stmt).one()
+
+    pokemons: list[Pokemon] = []
+    if pokemon_ids:
+        stmt = select(Pokemon).where(Pokemon.id.in_(pokemon_ids))
+        pokemons = db.scalars(stmt).all()
+        if len(pokemons) != len(pokemon_ids):
+            raise Exception("One or more Pokemons not found")
+
+    pokemon_by_id = {pokemon.id: pokemon for pokemon in pokemons}
+    if name is None:
+        if pokemon_ids:
+            pokemon_names = " / ".join(
+                pokemon_by_id[pokemon_id].name for pokemon_id in pokemon_ids
+            )
+            name = f"{set.abbreviation} - {pokemon_names}"
+        else:
+            name = set.abbreviation
+
+    booster = Booster(abstract_booster_id=abstract_booster_id, name=name)
+    try:
+        db.add(booster)
+        db.flush()
+        for pokemon_id in pokemon_ids:
+            db.add(BoosterPokemon(booster_id=booster.id, pokemon_id=pokemon_id))
+        db.commit()
+        db.refresh(booster)
+        return dto.BoosterDTO.from_orm(
+            booster, abstract_booster, set, [pokemon_by_id[pokemon_id] for pokemon_id in pokemon_ids]
+        )
+    except Exception:
+        db.rollback()
+        raise
 
 
 # --- Cards ---

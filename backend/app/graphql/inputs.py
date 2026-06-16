@@ -22,6 +22,13 @@ class CardCreationInput:
 
 
 @strawberry.input
+class BoosterCreationInput:
+    abstract_booster_id: int
+    pokemon_ids: List[int] = strawberry.field(default_factory=list)
+    name: Optional[str] = None
+
+
+@strawberry.input
 class PokemonFilter:
     name_regex: Optional[str] = None
     number: Optional[int] = None

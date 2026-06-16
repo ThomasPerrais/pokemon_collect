@@ -1,7 +1,17 @@
 import strawberry
 from datetime import date
 
-from app.db.dto import GenerationDTO, TypeDTO, TagDTO, PokemonDTO, EraDTO, SetDTO, CardDTO
+from app.db.dto import (
+    GenerationDTO,
+    TypeDTO,
+    TagDTO,
+    PokemonDTO,
+    EraDTO,
+    SetDTO,
+    CardDTO,
+    AbstractBoosterDTO,
+    BoosterDTO,
+)
 
 
 @strawberry.type
@@ -112,6 +122,38 @@ class SetGQL:
             era_index=set.era_index,
             release_date=set.release_date,
             abbreviation=set.abbreviation,
+        )
+
+
+@strawberry.type
+class AbstractBoosterGQL:
+    id: int
+    card_count: int
+    set: SetGQL
+
+    @classmethod
+    def from_dto(cls, abstract_booster: AbstractBoosterDTO) -> "AbstractBoosterGQL":
+        return cls(
+            id=abstract_booster.id,
+            card_count=abstract_booster.card_count,
+            set=SetGQL.from_dto(abstract_booster.set),
+        )
+
+
+@strawberry.type
+class BoosterGQL:
+    id: int
+    name: str
+    abstract_booster: AbstractBoosterGQL
+    pokemons: list[PokemonGQL]
+
+    @classmethod
+    def from_dto(cls, booster: BoosterDTO) -> "BoosterGQL":
+        return cls(
+            id=booster.id,
+            name=booster.name,
+            abstract_booster=AbstractBoosterGQL.from_dto(booster.abstract_booster),
+            pokemons=[PokemonGQL.from_dto(pokemon) for pokemon in booster.pokemons],
         )
 
 
