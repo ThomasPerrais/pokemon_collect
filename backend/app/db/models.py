@@ -243,7 +243,6 @@ class Card(Base):
         pokemon = "pokemon"
         object = "object"
         supporter = "supporter"
-        # trainer = "trainer"
         stadium = "stadium"
         energy = "energy"
         tool = "tool"
