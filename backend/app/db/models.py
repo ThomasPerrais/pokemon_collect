@@ -297,10 +297,12 @@ class AbstractBooster(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     set_id: Mapped[int] = mapped_column(ForeignKey("set.id"))
-    card_count: Mapped[int]
+    set_card_count: Mapped[int]
+    energy_card_count: Mapped[int]
+    special_card_count: Mapped[int]
 
     __table_args__ = (
-        UniqueConstraint("set_id", "card_count", name="uq_card_number_booster"),
+        UniqueConstraint("set_id", "set_card_count", name="uq_set_card_count_booster"),
     )
 
 

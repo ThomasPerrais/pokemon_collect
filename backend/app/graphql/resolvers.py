@@ -24,6 +24,7 @@ from app.graphql.inputs import (
     CardCreationInput,
     CardFilter,
     BoosterCreationInput,
+    AbstractBoosterCreationInput,
 )
 from datetime import date
 
@@ -184,10 +185,16 @@ def delete_set_resolver(id: int) -> bool:
 
 # --- Abstract boosters ---
 def create_abstract_booster_resolver(
-    card_count: int, set: str
+    abstract_booster: AbstractBoosterCreationInput,
 ) -> AbstractBoosterGQL:
     db: Session = next(get_db())
-    abstract_booster_dto = crud.create_abstract_booster(db, card_count, set)
+    abstract_booster_dto = crud.create_abstract_booster(
+        db,
+        abstract_booster.set,
+        abstract_booster.set_card_count,
+        abstract_booster.energy_card_count,
+        abstract_booster.special_card_count,
+    )
     return AbstractBoosterGQL.from_dto(abstract_booster_dto)
 
 
@@ -197,7 +204,7 @@ def create_booster_resolver(booster: BoosterCreationInput) -> BoosterGQL:
     booster_dto = crud.create_booster(
         db,
         booster.abstract_booster_id,
-        booster.pokemon_ids,
+        booster.pokemon_names,
         booster.name,
     )
     return BoosterGQL.from_dto(booster_dto)

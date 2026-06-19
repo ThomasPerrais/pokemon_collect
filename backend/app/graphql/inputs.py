@@ -22,9 +22,17 @@ class CardCreationInput:
 
 
 @strawberry.input
+class AbstractBoosterCreationInput:
+    set: str
+    set_card_count: int
+    energy_card_count: int = 0
+    special_card_count: int = 0
+
+
+@strawberry.input
 class BoosterCreationInput:
     abstract_booster_id: int
-    pokemon_ids: List[int] = strawberry.field(default_factory=list)
+    pokemon_names: List[str] = strawberry.field(default_factory=list)
     name: Optional[str] = None
 
 

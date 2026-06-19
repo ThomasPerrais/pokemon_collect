@@ -117,13 +117,13 @@ class Mutation:
     # --- Abstract boosters ---
     create_abstract_booster = strawberry.field(
         resolver=resolvers.create_abstract_booster_resolver,
-        description="Create an abstract booster for a set by abbreviation or name.",
+        description="Create an abstract booster for a set by abbreviation or name, with card counts.",
     )
 
     # --- Boosters ---
     create_booster = strawberry.field(
         resolver=resolvers.create_booster_resolver,
-        description="Create a booster illustration from an abstract booster and pokemon ids.",
+        description="Create a booster illustration from an abstract booster and pokemon names.",
     )
 
     # --- Cards ---

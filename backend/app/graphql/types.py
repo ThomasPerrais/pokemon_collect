@@ -128,14 +128,18 @@ class SetGQL:
 @strawberry.type
 class AbstractBoosterGQL:
     id: int
-    card_count: int
+    set_card_count: int
+    energy_card_count: int
+    special_card_count: int
     set: SetGQL
 
     @classmethod
     def from_dto(cls, abstract_booster: AbstractBoosterDTO) -> "AbstractBoosterGQL":
         return cls(
             id=abstract_booster.id,
-            card_count=abstract_booster.card_count,
+            set_card_count=abstract_booster.set_card_count,
+            energy_card_count=abstract_booster.energy_card_count,
+            special_card_count=abstract_booster.special_card_count,
             set=SetGQL.from_dto(abstract_booster.set),
         )
 

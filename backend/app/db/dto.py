@@ -107,7 +107,9 @@ class SetDTO:
 @dataclass
 class AbstractBoosterDTO:
     id: int
-    card_count: int
+    set_card_count: int
+    energy_card_count: int
+    special_card_count: int
     set: SetDTO
 
     @classmethod
@@ -116,7 +118,9 @@ class AbstractBoosterDTO:
     ) -> "AbstractBoosterDTO":
         return cls(
             id=abstract_booster.id,
-            card_count=abstract_booster.card_count,
+            set_card_count=abstract_booster.set_card_count,
+            energy_card_count=abstract_booster.energy_card_count,
+            special_card_count=abstract_booster.special_card_count,
             set=SetDTO.from_orm(set),
         )
 
